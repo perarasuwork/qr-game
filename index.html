@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#2b1a10" />
+<title>UPS Scan &amp; Solve</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ===================================================================== -->
+<!-- PHONE VIEW — shown only when the page is opened from a scanned QR     -->
+<!-- ===================================================================== -->
+<main id="screen-phone" class="screen phone" hidden>
+  <div class="phone-card">
+    <div class="phone-meta">
+      <span class="chip" id="phone-category">Routing</span>
+      <span class="phone-qnum" id="phone-qnum">Question 1</span>
+    </div>
+    <p class="phone-question" id="phone-question"></p>
+    <div class="phone-foot">
+      <span class="phone-arrow" aria-hidden="true">&#8592;</span>
+      Now choose your answer on the main screen
+    </div>
+  </div>
+  <p class="phone-hint">Keep this open. Scan the next QR code when the screen moves on.</p>
+</main>
+
+<!-- ===================================================================== -->
+<!-- HOME                                                                  -->
+<!-- ===================================================================== -->
+<main id="screen-home" class="screen" hidden>
+  <header class="hero">
+    <div class="brandmark">UPS</div>
+    <h1>Scan &amp; Solve</h1>
+    <p class="tagline">Scan the code. Read the question on your phone. Answer on the big screen.</p>
+  </header>
+
+  <section class="cards">
+    <article class="card">
+      <h2><span class="card-num">1</span> How to participate</h2>
+      <p>An interactive, mobile-based quiz where you scan a QR code to reveal each
+         question &mdash; mirroring the real warehouse habit of scanning a barcode to
+         pull up package information.</p>
+      <ul>
+        <li>Scan a QR code to unlock the live question</li>
+        <li>Read it on your phone, then answer on the main screen</li>
+        <li>Two sections: <b>UPS</b> operations and <b>QA</b> practice &mdash; 10 questions</li>
+      </ul>
+    </article>
+
+    <article class="card">
+      <h2><span class="card-num">2</span> What you will learn</h2>
+      <p>You will sharpen your picture of the UPS operation you support and of
+         the QA fundamentals behind the work &mdash; while getting a feel for how
+         scanning and tracking drive the whole business.</p>
+      <ul>
+        <li>UPS operations, terminology and tracking</li>
+        <li>QA fundamentals: test types, severity vs priority, UAT</li>
+        <li>Quick thinking under a live clock</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="startbox">
+    <label class="field">
+      <span>Team name</span>
+      <input id="player-name" type="text" placeholder="e.g. Night Sort Crew" maxlength="28" autocomplete="off" />
+    </label>
+
+    <div class="settings">
+      <label class="field small">
+        <span>Questions this round</span>
+        <select id="set-count">
+          <option value="0" selected>All 10</option>
+          <option value="6">6 &mdash; quick</option>
+          <option value="4">4 &mdash; very quick</option>
+        </select>
+      </label>
+      <label class="field small">
+        <span>Time per question</span>
+        <select id="set-timer">
+          <option value="0">No timer</option>
+          <option value="30">30 seconds</option>
+          <option value="45" selected>45 seconds</option>
+          <option value="60">60 seconds</option>
+          <option value="90">90 seconds</option>
+        </select>
+      </label>
+      <label class="field small">
+        <span>Question order</span>
+        <select id="set-shuffle">
+          <option value="1" selected>Shuffled</option>
+          <option value="0">UPS section, then QA</option>
+        </select>
+      </label>
+    </div>
+
+    <button id="btn-start" class="btn btn-primary btn-big">Start the round</button>
+
+    <p class="delivery-note" id="delivery-note"></p>
+
+    <button id="btn-leaderboard-home" class="btn btn-ghost btn-sm">View leaderboard</button>
+  </section>
+</main>
+
+<!-- ===================================================================== -->
+<!-- QUIZ                                                                  -->
+<!-- ===================================================================== -->
+<main id="screen-quiz" class="screen quiz" hidden>
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="progress-text"><b id="q-index">1</b> / <span id="q-total">12</span></span>
+      <span class="chip" id="q-category">Routing</span>
+    </div>
+    <div class="topbar-right">
+      <span class="score-pill">Score <b id="q-score">0</b></span>
+      <span class="timer-pill" id="timer-pill" hidden><b id="timer-secs">45</b>s</span>
+      <button id="btn-quit" class="btn btn-ghost btn-sm" title="End the round">End</button>
+    </div>
+  </div>
+  <div class="timer-track" id="timer-track" hidden><div class="timer-fill" id="timer-fill"></div></div>
+
+  <div class="stage">
+    <!-- Left: the code to scan -->
+    <section class="scanpanel">
+      <h2 class="scanpanel-title">Scan to reveal the question</h2>
+      <div class="qr-frame">
+        <canvas id="qr-canvas" aria-label="QR code containing the question"></canvas>
+      </div>
+      <p class="scanpanel-hint">Point your phone camera at the code</p>
+      <button id="btn-reveal" class="btn btn-ghost btn-sm">Can&rsquo;t scan? Show the question here</button>
+      <p class="revealed" id="revealed-question" hidden></p>
+    </section>
+
+    <!-- Right: the answer options -->
+    <section class="answerpanel">
+      <h2 class="answerpanel-title">Choose your answer</h2>
+      <div class="options" id="options" role="group" aria-label="Answer options"></div>
+
+      <div class="feedback" id="feedback" hidden>
+        <div class="feedback-head" id="feedback-head"></div>
+        <p class="feedback-body" id="feedback-body"></p>
+        <button id="btn-next" class="btn btn-primary">Next question <span class="kbd">Enter</span></button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- ===================================================================== -->
+<!-- RESULTS                                                               -->
+<!-- ===================================================================== -->
+<main id="screen-results" class="screen" hidden>
+  <header class="results-head">
+    <p class="results-for" id="results-for">Night Sort Crew</p>
+    <div class="results-score">
+      <span id="results-correct">9</span><span class="results-of">/ <span id="results-total">12</span></span>
+    </div>
+    <p class="results-verdict" id="results-verdict">Solid operational knowledge</p>
+  </header>
+
+  <section class="breakdown">
+    <h2>By section</h2>
+    <div id="breakdown-rows"></div>
+  </section>
+
+  <section class="review">
+    <h2>Question review</h2>
+    <div id="review-rows"></div>
+  </section>
+
+  <div class="results-actions">
+    <button id="btn-again" class="btn btn-primary">Play again</button>
+    <button id="btn-newteam" class="btn btn-ghost">Next team</button>
+    <button id="btn-leaderboard" class="btn btn-ghost">Leaderboard</button>
+  </div>
+</main>
+
+<!-- ===================================================================== -->
+<!-- LEADERBOARD                                                           -->
+<!-- ===================================================================== -->
+<main id="screen-leaderboard" class="screen" hidden>
+  <header class="hero compact">
+    <h1>Leaderboard</h1>
+    <p class="tagline lb-status" id="lb-status">Saved on this laptop only</p>
+  </header>
+  <section class="lb-wrap">
+    <table class="lb">
+      <thead><tr><th>#</th><th>Team</th><th>Score</th><th>%</th><th>When</th></tr></thead>
+      <tbody id="lb-body"></tbody>
+    </table>
+    <p class="lb-empty" id="lb-empty" hidden>No rounds played yet.</p>
+  </section>
+  <div class="results-actions">
+    <button id="btn-lb-back" class="btn btn-primary">Back</button>
+    <button id="btn-lb-refresh" class="btn btn-ghost" hidden>Refresh</button>
+    <button id="btn-lb-clear" class="btn btn-ghost">Clear leaderboard</button>
+  </div>
+
+  <!-- Password gate for clearing. A masked field rather than a prompt(), so
+       the password is not echoed on a projected screen. -->
+  <form class="admin-gate" id="admin-gate" hidden>
+    <p class="admin-gate-title" id="admin-gate-title">Facilitator password required</p>
+    <div class="admin-gate-row">
+      <input id="admin-pin" type="password" inputmode="numeric" maxlength="24"
+             autocomplete="off" placeholder="Password" aria-label="Facilitator password" />
+      <button type="submit" class="btn btn-primary btn-sm" id="btn-admin-go">Clear</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="btn-admin-cancel">Cancel</button>
+    </div>
+    <p class="admin-gate-msg" id="admin-gate-msg" role="status" hidden></p>
+  </form>
+</main>
+
+<script src="qr.js"></script>
+<script src="questions.js"></script>
+<script src="leaderboard.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
