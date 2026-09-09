@@ -20,8 +20,8 @@
 
   const CONFIG = {
 
-    /* 'auto' uses whichever block below is filled in, preferring Firestore.
-       Force one with 'firestore', 'flow', or 'local'. */
+    /* 'auto' uses whichever block below is filled in, preferring the HTTP
+       endpoint. Force one with 'flow', 'firestore', or 'local'. */
     backend: 'auto',
 
     /* ---------------------------------------------------------------------
@@ -39,18 +39,16 @@
     /* Whether that password also wipes the SHARED board, or only this
      * laptop's copy.
      *
-     * Leave this false unless you have changed the Firestore rules to say
-     *
-     *     allow delete: if true;
-     *
-     * ...and understand the trade-off: those rules are the only real gate,
-     * so once deletes are allowed, anyone who reads the password out of this
-     * file (or just calls the API directly) can wipe the board. The default
-     * of false means a reset is a deliberate act in the Firebase console. */
+     * Keep this false when the backend is a Val Town function: that function
+     * has no delete route at all, deliberately, so a shared clear is not
+     * something the page can do. Reset the board by dropping the table in the
+     * val's own SQLite view instead. (With Firestore it additionally needs
+     * `allow delete: if true` in the rules, and the same caveat applies —
+     * those rules, not this password, are the real gate.) */
     allowGlobalClear: false,
 
     /* ---------------------------------------------------------------------
-     * OPTION 1 — Firebase Firestore   (recommended: free, no approvals)
+     * OPTION B — Firebase Firestore
      * ---------------------------------------------------------------------
      * Free Spark plan: no credit card, 20,000 writes and 50,000 reads a day,
      * which is far more than a quiz session will ever use.
@@ -87,13 +85,29 @@
     },
 
     /* ---------------------------------------------------------------------
-     * OPTION 2 — any HTTP endpoint  (use this for SharePoint / Teams)
+     * OPTION A — any HTTP endpoint   (recommended: use it with Val Town)
      * ---------------------------------------------------------------------
      * postUrl receives   POST { id, name, score, total, pct, at }
      * getUrl must return an array of those same objects (or { value: [...] },
-     * which is what the SharePoint and Graph APIs return).
+     * which is what the SharePoint and Graph APIs return). Leave getUrl empty
+     * when a single URL answers both verbs, as a Val Town function does.
      *
-     * To point this at a SharePoint list via Power Automate:
+     * ---- Val Town: free, and signs in with your existing GitHub account ---
+     *
+     *  1. Deploy valtown-leaderboard.js from this repo. The steps are in the
+     *     comment at the top of that file and take about two minutes.
+     *  2. Paste the val's URL into postUrl below; leave getUrl empty:
+     *
+     *       postUrl: 'https://<your-username>-scoreboard.web.val.run',
+     *
+     * That is the whole client-side setup. This URL is safe to publish. The
+     * function behind it can add a round and list the board, and has no route
+     * that changes or deletes one, so nothing that reads this file can wipe
+     * anyone's scores.
+     *
+     * ---- Or a SharePoint list via Power Automate -------------------------
+     * Possible, but needs a premium licence — see the README before counting
+     * on it.
      *
      *  1. New flow -> "When an HTTP request is received"  (premium trigger —
      *     check your licence first)
@@ -119,7 +133,7 @@
      */
     flow: {
       postUrl: '',
-      getUrl: ''
+      getUrl: ''      // optional: defaults to postUrl
     },
 
     maxRows: 50,
@@ -320,11 +334,14 @@
       });
     },
 
+    // One URL commonly answers both verbs (a Val Town function does), so an
+    // empty getUrl means "read from the same place we write to".
     load() {
-      if (!CONFIG.flow.getUrl) {
+      const url = CONFIG.flow.getUrl || CONFIG.flow.postUrl;
+      if (!url) {
         return Promise.reject(new Error('No read URL is configured for this endpoint'));
       }
-      return request(CONFIG.flow.getUrl).then(res => {
+      return request(url).then(res => {
         if (!res.ok) throw new Error('The endpoint refused the read (' + res.status + ')');
         return res.json();
       }).then(data => {
@@ -350,8 +367,8 @@
       case 'firestore': return firestore.ready() ? firestore : null;
       case 'flow':      return flow.ready() ? flow : null;
       default:
-        if (firestore.ready()) return firestore;
         if (flow.ready()) return flow;
+        if (firestore.ready()) return firestore;
         return null;
     }
   }
@@ -413,7 +430,7 @@
   function friendlyError(err) {
     const raw = (err && err.message) || '';
     if (err && err.name === 'AbortError') return 'Shared leaderboard timed out';
-    if (/failed to fetch|networkerror|load failed/i.test(raw)) {
+    if (/failed to fetch|fetch failed|networkerror|load failed/i.test(raw)) {
       return 'No connection to the shared leaderboard';
     }
     return raw || 'Could not reach the shared leaderboard';

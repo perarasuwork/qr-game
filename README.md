@@ -63,10 +63,39 @@ and nobody else can see it. To make it global — so a score set on your laptop
 shows up on your friends' laptops — fill in one block at the top of
 `leaderboard.js`.
 
-### Firebase Firestore (recommended)
+### Val Town (recommended)
 
-Free forever on the Spark plan, no credit card, and 20,000 writes a day against
-a quiz that needs one write per round.
+Free, and it signs in with the GitHub account you already have, so there is no
+new account to create. `valtown-leaderboard.js` in this repo is the server side:
+a small function that stores the rounds and hands back the board.
+
+1. [val.town](https://val.town) → **Sign in with GitHub**
+2. **New → HTTP val**
+3. Delete the sample code, paste all of `valtown-leaderboard.js`, **Save**
+4. Copy the val's URL — it looks like
+   `https://<your-username>-scoreboard.web.val.run`
+5. Put it in the `flow` block of `leaderboard.js` and leave `getUrl` empty:
+
+   ```js
+   flow: {
+     postUrl: 'https://<your-username>-scoreboard.web.val.run',
+     getUrl: ''
+   },
+   ```
+
+That URL is safe to publish. The function can add a round and list the board,
+and has **no route that edits or deletes one** — so unlike a database the page
+talks to directly, no one who reads your source can wipe the leaderboard.
+
+It also validates every score server-side, where the browser cannot argue:
+a score above the total, a negative score, an absurd total or a missing id are
+all refused, and `pct` is recomputed rather than believed. Posting the same
+round twice stores it once.
+
+### Firebase Firestore
+
+Also free forever on the Spark plan, no credit card, 20,000 writes a day. Use
+this if you would rather not run a function.
 
 1. [console.firebase.google.com](https://console.firebase.google.com) → **Add
    project** (skip Analytics)
@@ -90,9 +119,12 @@ a quiz that needs one write per round.
    copy `projectId` and `apiKey` out of the snippet it shows you
 5. Paste those two values into the `firestore` block in `leaderboard.js`
 
-That's the whole setup. The `apiKey` is safe to publish — it identifies the
-project, it does not grant access. The rules above are what control access:
-anyone can add a score and read the board, nobody can edit or delete one.
+The `apiKey` is safe to publish — it identifies the project, it does not grant
+access. The rules above are what control access: anyone can add a score and
+read the board, nobody can edit or delete one.
+
+Note that Firestore trusts whatever the page sends, since the rules can check
+permissions but not arithmetic. The Val Town route validates scores instead.
 
 ### SharePoint or a Teams channel
 
@@ -193,6 +225,7 @@ gets denser and some phone camera apps truncate long text in the scan banner.
 | `app.js` | Game logic, timer, scoring, phone view |
 | `questions.js` | The question bank — **edit this one** |
 | `leaderboard.js` | Score storage — **edit this one** to make the board global |
+| `valtown-leaderboard.js` | The shared leaderboard's server side. Not loaded by the page — deploy it to Val Town |
 | `qr.js` | Self-contained QR encoder, so no CDN or internet is needed |
 
 ## Hosting it on GitHub Pages
