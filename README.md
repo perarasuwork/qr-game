@@ -1,33 +1,33 @@
-﻿# UPS Scan & Solve
+# UPS Scan & Solve
 
 An interactive, mobile-assisted quiz. The main screen shows a QR code and four
 answer options. Participants scan the code with their phone to reveal the
-question, then choose their answer on the main screen â€” mirroring the warehouse
+question, then choose their answer on the main screen — mirroring the warehouse
 habit of scanning a barcode to pull up package information.
 
 **10 questions across two sections**, pitched at medium difficulty:
 
-- **UPS** â€” tracking numbers, ORION, package cars vs feeders, dimensional
+- **UPS** — tracking numbers, ORION, package cars vs feeders, dimensional
   weight, Proof of Delivery
-- **QA** â€” smoke and regression testing, severity vs priority, UAT, boundary
+- **QA** — smoke and regression testing, severity vs priority, UAT, boundary
   value analysis
 
 ## Running it
 
-Double-click `index.html`. That's it â€” no install, no build step, no internet
+Double-click `index.html`. That's it — no install, no build step, no internet
 needed. Press `F11` for fullscreen when projecting.
 
 ## How a round works
 
 1. Enter a team name, pick the round length and timer, press **Start the round**.
-2. The main screen shows a QR code plus four options â€” but *not* the question.
+2. The main screen shows a QR code plus four options — but *not* the question.
 3. Participants point a phone camera at the code to read the question.
 4. They call out or pick the answer on the main screen.
 5. After each answer the correct option, the question and a short explanation
    appear for the debrief.
 6. The results screen gives a per-category breakdown and a full question review.
 
-**Facilitator keyboard shortcuts** (main screen): `A`â€“`D` or `1`â€“`4` to answer,
+**Facilitator keyboard shortcuts** (main screen): `A`–`D` or `1`–`4` to answer,
 `Enter` to advance, `R` to show the question on the main screen.
 
 ## Two ways the question reaches the phone
@@ -52,15 +52,15 @@ cd path/to/QR_Game
 python -m http.server 8000
 ```
 
-Then open `http://<laptop-ip>:8000` on the laptop â€” phones on the same network
+Then open `http://<laptop-ip>:8000` on the laptop — phones on the same network
 can reach it. `localhost` is deliberately treated as text mode, since phones
 cannot reach the laptop's localhost.
 
 ## The shared leaderboard
 
 By default the leaderboard is per-laptop: it lives in the browser's own storage
-and nobody else can see it. To make it global â€” so a score set on your laptop
-shows up on your friends' laptops â€” fill in one block at the top of
+and nobody else can see it. To make it global — so a score set on your laptop
+shows up on your friends' laptops — fill in one block at the top of
 `leaderboard.js`.
 
 ### Val Town (recommended)
@@ -69,10 +69,10 @@ Free, and it signs in with the GitHub account you already have, so there is no
 new account to create. `valtown-leaderboard.ts` in this repo is the server side:
 a small function that stores the rounds and hands back the board.
 
-1. [val.town](https://val.town) â†’ **Sign in with GitHub**
-2. **New â†’ HTTP val**
+1. [val.town](https://val.town) → **Sign in with GitHub**
+2. **New → HTTP val**
 3. Delete the sample code, paste all of `valtown-leaderboard.ts`, **Save**
-4. Copy the val's URL â€” it looks like
+4. Copy the val's URL — it looks like
    `https://<your-username>-scoreboard.web.val.run`
 5. Put it in the `flow` block of `leaderboard.js` and leave `getUrl` empty:
 
@@ -84,7 +84,7 @@ a small function that stores the rounds and hands back the board.
    ```
 
 That URL is safe to publish. The function can add a round and list the board,
-and has **no route that edits or deletes one** â€” so unlike a database the page
+and has **no route that edits or deletes one** — so unlike a database the page
 talks to directly, no one who reads your source can wipe the leaderboard.
 
 It also validates every score server-side, where the browser cannot argue:
@@ -97,10 +97,10 @@ round twice stores it once.
 Also free forever on the Spark plan, no credit card, 20,000 writes a day. Use
 this if you would rather not run a function.
 
-1. [console.firebase.google.com](https://console.firebase.google.com) â†’ **Add
+1. [console.firebase.google.com](https://console.firebase.google.com) → **Add
    project** (skip Analytics)
-2. **Build â†’ Firestore Database â†’ Create database**, start in *production* mode
-3. **Rules** tab â†’ paste this â†’ **Publish**:
+2. **Build → Firestore Database → Create database**, start in *production* mode
+3. **Rules** tab → paste this → **Publish**:
 
    ```
    rules_version = '2';
@@ -115,11 +115,11 @@ this if you would rather not run a function.
    }
    ```
 
-4. **Project settings â†’ General â†’ Your apps â†’ `</>`**, register a web app, and
+4. **Project settings → General → Your apps → `</>`**, register a web app, and
    copy `projectId` and `apiKey` out of the snippet it shows you
 5. Paste those two values into the `firestore` block in `leaderboard.js`
 
-The `apiKey` is safe to publish â€” it identifies the project, it does not grant
+The `apiKey` is safe to publish — it identifies the project, it does not grant
 access. The rules above are what control access: anyone can add a score and
 read the board, nobody can edit or delete one.
 
@@ -133,9 +133,9 @@ Possible, but not self-serve, so don't let a session depend on it:
 | Route | Verdict |
 | --- | --- |
 | SharePoint REST from the browser | **No.** No anonymous write, and no CORS for a `github.io` origin. |
-| MSAL sign-in â†’ Microsoft Graph â†’ SharePoint list | Works, but needs an Entra app registration (IT approval) and **every player signs in** with a Cognizant account. Nobody outside the tenant can play. |
+| MSAL sign-in → Microsoft Graph → SharePoint list | Works, but needs an Entra app registration (IT approval) and **every player signs in** with a Cognizant account. Nobody outside the tenant can play. |
 | Teams incoming webhook | Can *push* scores into a channel, but there is no way to read them back, so no leaderboard. Microsoft is retiring these connectors. |
-| Power Automate HTTP trigger â†’ SharePoint list | The one that fits â€” anonymous POST, flow writes the row. But that trigger is a **premium** connector, so it depends on your licence. |
+| Power Automate HTTP trigger → SharePoint list | The one that fits — anonymous POST, flow writes the row. But that trigger is a **premium** connector, so it depends on your licence. |
 
 If you get a Power Automate flow URL, put it in the `flow` block instead of the
 `firestore` one; the rest of the game is unchanged. The comments in
@@ -160,7 +160,7 @@ top of `leaderboard.js` (currently `2005`).
 > **This is a speed bump, not security.** The game is a public static page, so
 > anyone can open view-source or devtools and read the password in about ten
 > seconds. It stops a participant clearing the board on a whim. It does not
-> stop anyone who actually wants to, and no static page can â€” keeping a secret
+> stop anyone who actually wants to, and no static page can — keeping a secret
 > needs a backend with real sign-in.
 
 What the password clears depends on `allowGlobalClear`:
@@ -170,11 +170,11 @@ What the password clears depends on `allowGlobalClear`:
 | `false` *(default)* | `allow delete: if false` | Clears **this laptop's copy** only. Everyone else's scores are safe, and so are yours on the shared board. |
 | `true` | `allow delete: if true` | Wipes the **shared board for everyone**, then this laptop's copy. |
 
-If you want the second row, change both â€” the config flag *and* the rules. The
+If you want the second row, change both — the config flag *and* the rules. The
 rules are the only real gate, so be clear-eyed about the trade-off: once deletes
 are allowed, anyone who reads the password out of the file (or just calls the
 API directly) can reset the board. Leaving the default means a reset is a
-deliberate act in the Firebase console: **Firestore â†’ `scores` collection â†’
+deliberate act in the Firebase console: **Firestore → `scores` collection →
 delete**.
 
 Setting `adminPin: ''` removes the prompt entirely.
@@ -198,7 +198,7 @@ Open `questions.js` in any text editor and save. No tools required.
 }
 ```
 
-Put the correct answer first and leave `answer: 0` â€” the app **always** shuffles
+Put the correct answer first and leave `answer: 0` — the app **always** shuffles
 the option order on screen, so position never gives the answer away.
 
 Use `category: 'UPS'` or `category: 'QA'`. To add a third section, add its name
@@ -223,15 +223,15 @@ gets denser and some phone camera apps truncate long text in the scan banner.
 | `index.html` | Page structure for all screens |
 | `styles.css` | Styling, including the separate phone layout |
 | `app.js` | Game logic, timer, scoring, phone view |
-| `questions.js` | The question bank â€” **edit this one** |
-| `leaderboard.js` | Score storage â€” **edit this one** to make the board global |
-| `valtown-leaderboard.ts` | The shared leaderboard's server side. Not loaded by the page â€” deploy it to Val Town |
+| `questions.js` | The question bank — **edit this one** |
+| `leaderboard.js` | Score storage — **edit this one** to make the board global |
+| `valtown-leaderboard.ts` | The shared leaderboard's server side. Not loaded by the page — deploy it to Val Town |
 | `qr.js` | Self-contained QR encoder, so no CDN or internet is needed |
 
 ## Hosting it on GitHub Pages
 
 1. Push these files to a repo
-2. **Settings â†’ Pages â†’ Deploy from a branch**, pick `main` and `/ (root)`
+2. **Settings → Pages → Deploy from a branch**, pick `main` and `/ (root)`
 3. Open the `https://<you>.github.io/<repo>/` URL it gives you
 
 Serving over HTTPS also switches the QR codes into hosted mode, so phones open
@@ -239,7 +239,7 @@ a properly styled question page instead of showing raw text.
 
 ## Notes
 
-- Scores go to whatever `leaderboard.js` is configured for â€” this laptop only
+- Scores go to whatever `leaderboard.js` is configured for — this laptop only
   by default, or a shared board once you fill in a backend.
 - The timer is optional. With it off, teams can take as long as they like.
 - Every team gets the same 10 questions, so the leaderboard is a fair comparison.

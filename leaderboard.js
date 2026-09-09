@@ -1,5 +1,5 @@
-﻿/* ---------------------------------------------------------------------------
- * leaderboard.js â€” where scores are stored
+/* ---------------------------------------------------------------------------
+ * leaderboard.js — where scores are stored
  *
  * Out of the box the leaderboard is per-laptop, exactly as it was before: it
  * lives in this browser's localStorage and nobody else can see it.
@@ -31,7 +31,7 @@
      * The game is a public static page, so anyone who opens view-source or
      * the browser devtools can read the value below in about ten seconds.
      * It stops a participant clearing the board on a whim; it does not stop
-     * anyone who actually wants to. A static page cannot keep a secret â€”
+     * anyone who actually wants to. A static page cannot keep a secret —
      * only a backend with real sign-in can do that.
      */
     adminPin: '2005',
@@ -43,12 +43,12 @@
      * has no delete route at all, deliberately, so a shared clear is not
      * something the page can do. Reset the board by dropping the table in the
      * val's own SQLite view instead. (With Firestore it additionally needs
-     * `allow delete: if true` in the rules, and the same caveat applies â€”
+     * `allow delete: if true` in the rules, and the same caveat applies —
      * those rules, not this password, are the real gate.) */
     allowGlobalClear: false,
 
     /* ---------------------------------------------------------------------
-     * OPTION B â€” Firebase Firestore
+     * OPTION B — Firebase Firestore
      * ---------------------------------------------------------------------
      * Free Spark plan: no credit card, 20,000 writes and 50,000 reads a day,
      * which is far more than a quiz session will ever use.
@@ -74,7 +74,7 @@
      *         config snippet it shows you
      *  5. Paste those two values below. That is the whole setup.
      *
-     * The apiKey is safe to publish â€” it identifies the project, it does not
+     * The apiKey is safe to publish — it identifies the project, it does not
      * grant access. The rules above are what actually control access: anyone
      * can add a score and read the board, nobody can edit or delete one.
      */
@@ -85,7 +85,7 @@
     },
 
     /* ---------------------------------------------------------------------
-     * OPTION A â€” any HTTP endpoint   (recommended: use it with Val Town)
+     * OPTION A — any HTTP endpoint   (recommended: use it with Val Town)
      * ---------------------------------------------------------------------
      * postUrl receives   POST { id, name, score, total, pct, at }
      * getUrl must return an array of those same objects (or { value: [...] },
@@ -106,10 +106,10 @@
      * anyone's scores.
      *
      * ---- Or a SharePoint list via Power Automate -------------------------
-     * Possible, but needs a premium licence â€” see the README before counting
+     * Possible, but needs a premium licence — see the README before counting
      * on it.
      *
-     *  1. New flow -> "When an HTTP request is received"  (premium trigger â€”
+     *  1. New flow -> "When an HTTP request is received"  (premium trigger —
      *     check your licence first)
      *  2. Request Body JSON Schema:
      *       { "type": "object", "properties": {
@@ -158,7 +158,7 @@
     try {
       localStorage.setItem(key, JSON.stringify(rows));
     } catch (err) {
-      /* private browsing or a full quota â€” the round still finished fine */
+      /* private browsing or a full quota — the round still finished fine */
     }
   }
 
@@ -317,7 +317,7 @@
     }
   };
 
-  /* ---- backend: plain HTTP endpoint (Power Automate, Apps Script, â€¦) ---- */
+  /* ---- backend: plain HTTP endpoint (Power Automate, Apps Script, …) ---- */
 
   const flow = {
     ready() {
@@ -398,7 +398,7 @@
           sent++;
           writeList(STORE_PENDING, readList(STORE_PENDING).filter(p => p.id !== entry.id));
         },
-        () => { /* still unreachable â€” leave it queued for next time */ }
+        () => { /* still unreachable — leave it queued for next time */ }
       )
     ), Promise.resolve()).then(() => sent);
   }
@@ -419,7 +419,7 @@
       return Promise.reject(new Error('Clearing the shared board is switched off in leaderboard.js'));
     }
     if (!remote.clearAll) {
-      return Promise.reject(new Error('This backend cannot be cleared from the page â€” clear it at the source'));
+      return Promise.reject(new Error('This backend cannot be cleared from the page — clear it at the source'));
     }
     return remote.clearAll();
   }
@@ -483,8 +483,8 @@
 
   function describe(source) {
     const which = source || lastSource;
-    if (which === 'global') return 'Shared by everyone playing â€” refresh to pull in new rounds';
-    if (remote) return (lastError || 'Shared leaderboard unreachable') + ' Â· showing this laptop only';
+    if (which === 'global') return 'Shared by everyone playing — refresh to pull in new rounds';
+    if (remote) return (lastError || 'Shared leaderboard unreachable') + ' · showing this laptop only';
     return 'Saved on this laptop only';
   }
 
