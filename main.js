@@ -42,12 +42,6 @@
       '/contents/' + encodeURIComponent(CONFIG.folder) + '?ref=' + encodeURIComponent(CONFIG.branch);
   }
 
-  function deleteHref(name) {
-    const path = [CONFIG.folder, name].map(encodeURIComponent).join('/');
-    return 'https://github.com/' + CONFIG.owner + '/' + CONFIG.repo +
-      '/delete/' + encodeURIComponent(CONFIG.branch) + '/' + path;
-  }
-
   function render(files) {
     list.innerHTML = '';
     empty.hidden = files.length > 0;
@@ -63,15 +57,6 @@
       link.href = fileHref(file.name);
       link.setAttribute('download', file.name);
       link.setAttribute('aria-label', 'Download ' + file.name);
-
-      const deleteLink = row.querySelector('.delete');
-      deleteLink.href = deleteHref(file.name);
-      deleteLink.setAttribute('aria-label', 'Delete ' + file.name + ' on GitHub');
-      deleteLink.addEventListener('click', event => {
-        if (!window.confirm('Open GitHub to permanently delete "' + file.name + '"?')) {
-          event.preventDefault();
-        }
-      });
 
       list.appendChild(row);
     });

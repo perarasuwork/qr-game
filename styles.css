@@ -56,8 +56,7 @@ h1 {
 }
 
 .refresh,
-.download,
-.delete {
+.download {
   border: 0;
   border-radius: 8px;
   background: var(--accent);
@@ -78,17 +77,8 @@ h1 {
   background: var(--accent-dark);
 }
 
-.delete {
-  background: var(--danger);
-}
-
-.delete:hover {
-  background: #912018;
-}
-
 .refresh:focus-visible,
-.download:focus-visible,
-.delete:focus-visible {
+.download:focus-visible {
   outline: 3px solid rgba(37, 99, 235, .28);
   outline-offset: 3px;
 }
@@ -190,16 +180,6 @@ h1 {
   font-size: .92rem;
 }
 
-.file-actions {
-  display: flex;
-  gap: 9px;
-}
-
-.delete {
-  padding: 11px 16px;
-  font-size: .92rem;
-}
-
 .empty {
   padding: 42px 24px;
   text-align: center;
@@ -234,12 +214,8 @@ h1 {
     height: 46px;
   }
 
-  .file-actions {
+  .download {
     grid-column: 1 / -1;
-  }
-
-  .file-actions a {
-    flex: 1;
     text-align: center;
   }
 }
